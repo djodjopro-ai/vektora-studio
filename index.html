@@ -56,11 +56,11 @@
       theme: {
         extend: {
           colors: {
-            surface: '#FAFAFA',
-            ink: '#18181B',
-            muted: '#71717A',
-            faint: '#A1A1AA',
-            divider: '#E4E4E7',
+            surface: '#050510',
+            ink: '#E8ECF4',
+            muted: '#8896AB',
+            faint: '#5A6B82',
+            divider: 'rgba(255,255,255,0.08)',
             accent: '#a680ff',
             'accent-hover': '#9466f0',
             // Per-project accent colors
@@ -90,11 +90,22 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
 
+  <!-- Three.js -->
+  <script type="importmap">
+  { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js" } }
+  </script>
+
+  <!-- Preload Earth texture -->
+  <link rel="preload" href="images/earth-texture.webp" as="image">
+  <link rel="preload" href="images/earth-clouds.webp" as="image">
+  <link rel="preload" href="images/earth-bump.webp" as="image">
+  <link rel="preload" href="images/earth-specular.webp" as="image">
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: #FAFAFA;
-      color: #18181B;
+      background: #050510;
+      color: #E8ECF4;
       font-family: 'Outfit', system-ui, sans-serif;
       overflow-x: hidden;
     }
@@ -103,7 +114,7 @@
     .loader {
       position: fixed;
       inset: 0;
-      background: #FAFAFA;
+      background: #050510;
       z-index: 9999;
       display: flex;
       align-items: center;
@@ -112,7 +123,7 @@
     .loader-bar {
       width: 60px;
       height: 3px;
-      background: #E4E4E7;
+      background: rgba(255,255,255,0.1);
       border-radius: 3px;
       overflow: hidden;
       position: relative;
@@ -122,7 +133,7 @@
       position: absolute;
       left: 0; top: 0; bottom: 0;
       width: 0%;
-      background: #18181B;
+      background: #a680ff;
       border-radius: 3px;
       animation: loaderFill 1.2s cubic-bezier(0.32, 0.72, 0, 1) forwards;
     }
@@ -137,10 +148,10 @@
       left: 50%;
       transform: translateX(-50%);
       z-index: 100;
-      background: rgba(255, 255, 255, 0.72);
+      background: rgba(5, 5, 16, 0.7);
       backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 9999px;
       padding: 0.625rem 0.625rem 0.625rem 1.5rem;
       display: flex;
@@ -149,8 +160,8 @@
       transition: all 700ms cubic-bezier(0.32, 0.72, 0, 1);
     }
     .nav-pill.scrolled {
-      background: rgba(255, 255, 255, 0.88);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+      background: rgba(5, 5, 16, 0.9);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
     }
     .nav-link {
       font-family: 'IBM Plex Mono', monospace;
@@ -158,7 +169,7 @@
       font-weight: 500;
       letter-spacing: 0.05em;
       text-transform: uppercase;
-      color: #71717A;
+      color: #8896AB;
       padding: 0.5rem 1rem;
       border-radius: 9999px;
       transition: all 400ms cubic-bezier(0.32, 0.72, 0, 1);
@@ -166,15 +177,15 @@
       white-space: nowrap;
     }
     .nav-link:hover {
-      color: #18181B;
-      background: rgba(0, 0, 0, 0.04);
+      color: #E8ECF4;
+      background: rgba(255, 255, 255, 0.06);
     }
     .nav-cta {
       font-family: 'Outfit', sans-serif;
       font-size: 0.8125rem;
       font-weight: 600;
-      color: #FAFAFA;
-      background: #18181B;
+      color: #0a0f1e;
+      background: #a680ff;
       padding: 0.5rem 1.25rem;
       border-radius: 9999px;
       text-decoration: none;
@@ -185,7 +196,7 @@
       gap: 0.5rem;
     }
     .nav-cta:hover {
-      background: #27272A;
+      background: #b794ff;
       transform: scale(1.02);
     }
     .nav-cta:active {
@@ -195,7 +206,7 @@
       width: 1.375rem;
       height: 1.375rem;
       border-radius: 9999px;
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(10, 15, 30, 0.2);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -204,7 +215,7 @@
     }
     .nav-cta:hover .arrow-circle {
       transform: translateX(2px) translateY(-1px) scale(1.05);
-      background: rgba(255, 255, 255, 0.25);
+      background: rgba(10, 15, 30, 0.3);
     }
 
     /* Mobile hamburger */
@@ -223,7 +234,7 @@
       display: block;
       width: 18px;
       height: 1.5px;
-      background: #18181B;
+      background: #E8ECF4;
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
@@ -246,7 +257,7 @@
       position: fixed;
       inset: 0;
       z-index: 99;
-      background: rgba(250, 250, 250, 0.95);
+      background: rgba(5, 5, 16, 0.95);
       backdrop-filter: blur(40px) saturate(180%);
       -webkit-backdrop-filter: blur(40px) saturate(180%);
       display: flex;
@@ -266,7 +277,7 @@
       font-family: 'Outfit', sans-serif;
       font-size: 2rem;
       font-weight: 700;
-      color: #18181B;
+      color: #E8ECF4;
       text-decoration: none;
       transform: translateY(3rem);
       opacity: 0;
@@ -281,6 +292,12 @@
     .mobile-menu.open a:nth-child(3) { transition-delay: 200ms; }
     .mobile-menu.open a:nth-child(4) { transition-delay: 260ms; }
     .mobile-menu.open a:nth-child(5) { transition-delay: 320ms; }
+
+    /* All content above canvas */
+    section, footer, nav {
+      position: relative;
+      z-index: 1;
+    }
 
     /* Hero */
     .hero {
@@ -297,7 +314,7 @@
       font-weight: 800;
       line-height: 0.92;
       letter-spacing: -0.03em;
-      color: #18181B;
+      color: #E8ECF4;
     }
     .hero-line {
       display: block;
@@ -319,7 +336,7 @@
       font-weight: 400;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: #71717A;
+      color: #8896AB;
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
@@ -345,12 +362,12 @@
       font-size: 0.6875rem;
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: #A1A1AA;
+      color: #5A6B82;
     }
     .scroll-line {
       width: 1px;
       height: 40px;
-      background: linear-gradient(to bottom, #A1A1AA, transparent);
+      background: linear-gradient(to bottom, #5A6B82, transparent);
       animation: scrollPulse 2s ease-in-out infinite;
     }
     @keyframes scrollPulse {
@@ -358,27 +375,52 @@
       50% { opacity: 1; transform: scaleY(1); }
     }
 
-    /* Background gradient orbs */
-    .bg-orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(100px);
+    /* 3D Globe container */
+    #globeContainer {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
       pointer-events: none;
-      opacity: 0.35;
+      z-index: 0;
+      overflow: hidden;
     }
-    .bg-orb-1 {
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(166, 128, 255, 0.2), transparent 70%);
-      top: -10%;
-      right: -10%;
+    #globeContainer canvas {
+      width: 100% !important;
+      height: 100% !important;
     }
-    .bg-orb-2 {
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(166, 128, 255, 0.12), transparent 70%);
-      bottom: 10%;
-      left: -8%;
+
+    /* CSS atmosphere glow - ultra-soft ambient bloom behind globe */
+    #globeGlow {
+      position: fixed;
+      width: 900px;
+      height: 900px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle,
+        rgba(30, 90, 200, 0.08) 0%,
+        rgba(25, 70, 160, 0.04) 25%,
+        rgba(20, 50, 130, 0.015) 45%,
+        transparent 60%
+      );
+      filter: blur(60px);
+      transition: opacity 0.3s;
+    }
+    @media (max-width: 767px) {
+      #globeGlow { display: none; }
+    }
+
+    /* Deep space radial glow behind the globe - subtle, blends with Three.js space */
+    #globeVignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      background: none;
     }
 
     /* Section shared styles */
@@ -388,7 +430,7 @@
       font-weight: 500;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: #A1A1AA;
+      color: #5A6B82;
       display: inline-flex;
       align-items: center;
       gap: 0.75rem;
@@ -399,14 +441,14 @@
       display: block;
       width: 24px;
       height: 1px;
-      background: #D4D4D8;
+      background: #3A4A5E;
     }
     .section-heading {
       font-size: clamp(2.5rem, 6vw, 4.5rem);
       font-weight: 800;
       line-height: 1;
       letter-spacing: -0.03em;
-      color: #18181B;
+      color: #E8ECF4;
     }
 
     /* Reveal animations */
@@ -424,7 +466,7 @@
 
     /* Work section - project list */
     .project-row {
-      border-top: 1px solid #E4E4E7;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
       padding: 3rem 0;
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -434,11 +476,11 @@
       transition: all 500ms cubic-bezier(0.32, 0.72, 0, 1);
     }
     .project-row:last-child {
-      border-bottom: 1px solid #E4E4E7;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
     .project-row:hover {
       padding-left: 1rem;
-      background: rgba(0, 0, 0, 0.008);
+      background: rgba(255, 255, 255, 0.02);
     }
     .project-row:hover .project-img {
       transform: scale(1.03);
@@ -449,7 +491,7 @@
     }
     .project-arrow {
       font-size: 1.25rem;
-      color: var(--proj-color, #A1A1AA);
+      color: var(--proj-color, #5A6B82);
       opacity: 0;
       transform: translateX(-0.5rem);
       transition: all 500ms cubic-bezier(0.32, 0.72, 0, 1);
@@ -476,18 +518,18 @@
       font-size: 0.6875rem;
       font-weight: 400;
       letter-spacing: 0.05em;
-      color: #A1A1AA;
-      background: rgba(0, 0, 0, 0.03);
+      color: #8896AB;
+      background: rgba(255, 255, 255, 0.04);
       padding: 0.25rem 0.75rem;
       border-radius: 9999px;
-      border: 1px solid rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
     .project-img-wrapper {
       border-radius: 1rem;
       overflow: hidden;
-      background: #F4F4F5;
+      background: rgba(255, 255, 255, 0.03);
       padding: 0.375rem;
-      border: 1px solid rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
     .project-img {
       width: 100%;
@@ -499,7 +541,7 @@
     .project-number {
       font-family: 'IBM Plex Mono', monospace;
       font-size: 0.75rem;
-      color: #D4D4D8;
+      color: #3A4A5E;
       margin-bottom: 0.5rem;
     }
 
@@ -569,7 +611,7 @@
       left: 50%;
       transform: translate(-50%, -50%);
       font-size: 0.625rem;
-      color: #18181B;
+      color: #0a0f1e;
       letter-spacing: 0.15em;
       z-index: 11;
       pointer-events: none;
@@ -596,7 +638,7 @@
 
     /* Services section */
     .service-item {
-      border-top: 1px solid #E4E4E7;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
       padding: 2.5rem 0;
       display: grid;
       grid-template-columns: auto 1fr auto;
@@ -604,19 +646,19 @@
       align-items: baseline;
     }
     .service-item:last-child {
-      border-bottom: 1px solid #E4E4E7;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
     .service-item {
       transition: all 400ms cubic-bezier(0.32, 0.72, 0, 1);
     }
     .service-item:hover {
       padding-left: 0.75rem;
-      background: rgba(0, 0, 0, 0.008);
+      background: rgba(255, 255, 255, 0.02);
     }
     .service-number {
       font-family: 'IBM Plex Mono', monospace;
       font-size: 0.75rem;
-      color: #D4D4D8;
+      color: #3A4A5E;
     }
     .service-name {
       font-size: clamp(1.5rem, 3vw, 2.25rem);
@@ -625,7 +667,7 @@
     }
     .service-desc {
       font-size: 0.9375rem;
-      color: #71717A;
+      color: #8896AB;
       max-width: 280px;
       text-align: right;
     }
@@ -637,16 +679,16 @@
       gap: 1.5rem;
     }
     .process-card {
-      background: rgba(0, 0, 0, 0.02);
-      border: 1px solid rgba(0, 0, 0, 0.04);
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 1.5rem;
       padding: 2rem 1.5rem;
     }
     .process-card-inner {
-      background: white;
+      background: rgba(255, 255, 255, 0.04);
       border-radius: calc(1.5rem - 0.375rem);
       padding: 2rem 1.5rem;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
     }
     .process-step {
       font-family: 'IBM Plex Mono', monospace;
@@ -664,7 +706,7 @@
     }
     .process-desc {
       font-size: 0.875rem;
-      color: #71717A;
+      color: #8896AB;
       line-height: 1.5;
     }
 
@@ -680,7 +722,7 @@
       font-size: 0.6875rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: #A1A1AA;
+      color: #5A6B82;
       margin-top: 0.5rem;
     }
 
@@ -693,9 +735,9 @@
     .tool-pill {
       font-family: 'IBM Plex Mono', monospace;
       font-size: 0.75rem;
-      color: #71717A;
-      background: rgba(0, 0, 0, 0.03);
-      border: 1px solid rgba(0, 0, 0, 0.04);
+      color: #8896AB;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       padding: 0.5rem 1rem;
       border-radius: 9999px;
     }
@@ -704,9 +746,9 @@
     .contact-email {
       font-size: clamp(1.25rem, 3vw, 2rem);
       font-weight: 500;
-      color: #18181B;
+      color: #E8ECF4;
       text-decoration: none;
-      border-bottom: 2px solid #E4E4E7;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
       padding-bottom: 0.25rem;
       transition: all 400ms cubic-bezier(0.32, 0.72, 0, 1);
     }
@@ -717,17 +759,17 @@
     .social-link {
       font-family: 'IBM Plex Mono', monospace;
       font-size: 0.8125rem;
-      color: #71717A;
+      color: #8896AB;
       text-decoration: none;
       padding: 0.75rem 1.25rem;
       border-radius: 9999px;
-      border: 1px solid #E4E4E7;
+      border: 1px solid rgba(255, 255, 255, 0.08);
       transition: all 400ms cubic-bezier(0.32, 0.72, 0, 1);
     }
     .social-link:hover {
-      color: #18181B;
-      border-color: #18181B;
-      background: rgba(0, 0, 0, 0.02);
+      color: #E8ECF4;
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.04);
     }
 
     /* Case study expand indicator */
@@ -735,7 +777,7 @@
       font-family: 'IBM Plex Mono', monospace;
       font-size: 0.6875rem;
       letter-spacing: 0.05em;
-      color: #A1A1AA;
+      color: #5A6B82;
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
@@ -750,7 +792,7 @@
       transform: rotate(45deg);
     }
     .project-row:hover .cs-indicator {
-      color: var(--proj-color, #71717A);
+      color: var(--proj-color, #8896AB);
     }
 
     /* Responsive */
@@ -809,6 +851,15 @@
 </head>
 <body>
 
+  <!-- Background vignette for globe -->
+  <div id="globeVignette"></div>
+
+  <!-- CSS-based globe atmosphere glow (no geometry = no ring artifact) -->
+  <div id="globeGlow"></div>
+
+  <!-- 3D Globe background -->
+  <div id="globeContainer"></div>
+
   <!-- Loader -->
   <div class="loader" id="loader">
     <div class="loader-bar"></div>
@@ -845,9 +896,6 @@
   <!-- HERO -->
   <!-- ============================================ -->
   <section class="hero" id="home">
-    <div class="bg-orb bg-orb-1"></div>
-    <div class="bg-orb bg-orb-2"></div>
-
     <div class="relative z-10 max-w-5xl mx-auto">
       <h1 class="hero-title" style="font-size: clamp(4rem, 12vw, 9rem);">
         <span class="hero-line"><span class="hero-line-inner">Vektora</span></span>
@@ -1035,7 +1083,7 @@
       </div>
 
       <!-- Project 4: Grifa -->
-      <div class="project-row reveal" style="--proj-color: #4A7C6F;">
+      <div class="project-row reveal" style="--proj-color: #4A7C6F;" id="row-grifa">
         <div class="project-info">
           <div class="project-number">04</div>
           <h3 class="project-name">Grifa</h3>
@@ -1054,7 +1102,7 @@
       </div>
 
       <!-- Project 5: SApuNiJA -->
-      <div class="project-row reveal" style="--proj-color: #D4A0B0;">
+      <div class="project-row reveal" style="--proj-color: #D4A0B0;" id="row-soap">
         <div class="project-info">
           <div class="project-number">05</div>
           <h3 class="project-name">SApuNiJA</h3>
@@ -1263,6 +1311,11 @@
   <!-- JAVASCRIPT -->
   <!-- ============================================ -->
   <script>
+    // ---- 3D EARTH GLOBE (Three.js) ----
+    // Globe is initialized from a module script below (importmap requires type=module)
+    // This flag lets the loader know when the globe texture is ready
+    window._globeReady = false;
+
     // ---- LENIS SMOOTH SCROLL ----
     const lenis = new Lenis({
       duration: 1.2,
@@ -1283,16 +1336,27 @@
     // ---- LOADER ----
     window.addEventListener('load', () => {
       const loader = document.getElementById('loader');
-      gsap.to(loader, {
-        opacity: 0,
-        duration: 0.5,
-        delay: 1.3,
-        ease: 'power2.out',
-        onComplete: () => {
-          loader.style.display = 'none';
-          animateHero();
-        }
-      });
+      function dismissLoader() {
+        gsap.to(loader, {
+          opacity: 0,
+          duration: 0.5,
+          delay: 0.3,
+          ease: 'power2.out',
+          onComplete: () => {
+            loader.style.display = 'none';
+            animateHero();
+          }
+        });
+      }
+      // Wait for globe texture or timeout after 4s
+      if (window._globeReady) {
+        dismissLoader();
+      } else {
+        const globeCheck = setInterval(() => {
+          if (window._globeReady) { clearInterval(globeCheck); dismissLoader(); }
+        }, 100);
+        setTimeout(() => { clearInterval(globeCheck); dismissLoader(); }, 4000);
+      }
     });
 
     // ---- HERO ANIMATION ----
@@ -1414,6 +1478,9 @@
       if (!isOpen) {
         setTimeout(() => initSlider(el.querySelector('.ba-slider')), 100);
       }
+
+      // Refresh ScrollTrigger after case study expand/collapse transition
+      setTimeout(() => ScrollTrigger.refresh(), 750);
     }
 
     // ---- BEFORE/AFTER SLIDER ----
@@ -1517,6 +1584,990 @@
         });
       }
     });
+  </script>
+
+  <!-- Three.js Globe Module -->
+  <script type="module">
+    import * as THREE from 'three';
+
+    // ---- MOBILE CHECK: Skip Three.js below 768px ----
+    if (window.innerWidth < 768) {
+      document.getElementById('globeContainer').style.display = 'none';
+      window._globeReady = true;
+    } else {
+      initGlobe();
+    }
+
+    function initGlobe() {
+      const container = document.getElementById('globeContainer');
+
+      // ---- RENDERER ----
+      const renderer = new THREE.WebGLRenderer({
+        alpha: false,
+        antialias: true,
+        powerPreference: 'high-performance',
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setClearColor(0x050510, 1);
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.3;
+      container.appendChild(renderer.domElement);
+
+      // ---- SCENE & CAMERA ----
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x050510);
+      const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 0, 3.5);
+
+      // ---- STARFIELD ----
+      const starCount = 2000;
+      const starPositions = new Float32Array(starCount * 3);
+      const starSizes = new Float32Array(starCount);
+      const starPhases = new Float32Array(starCount);
+      const starBrightness = new Float32Array(starCount);
+      for (let i = 0; i < starCount; i++) {
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        const r = 8 + Math.random() * 50;
+        const x = r * Math.sin(phi) * Math.cos(theta);
+        const y = r * Math.sin(phi) * Math.sin(theta);
+        const z = r * Math.cos(phi);
+        // Skip stars that would overlap with the globe (within radius ~2)
+        const distFromCenter = Math.sqrt(x * x + y * y + z * z);
+        if (distFromCenter < 5) {
+          // Push outward
+          const scale = 6 / distFromCenter;
+          starPositions[i * 3] = x * scale;
+          starPositions[i * 3 + 1] = y * scale;
+          starPositions[i * 3 + 2] = z * scale;
+        } else {
+          starPositions[i * 3] = x;
+          starPositions[i * 3 + 1] = y;
+          starPositions[i * 3 + 2] = z;
+        }
+        // Most stars small, a few bright ones
+        const isBright = Math.random() < 0.1;
+        starSizes[i] = isBright ? (2.0 + Math.random() * 3.0) : (0.6 + Math.random() * 1.5);
+        starPhases[i] = Math.random() * Math.PI * 2;
+        starBrightness[i] = isBright ? (0.8 + Math.random() * 0.2) : (0.3 + Math.random() * 0.5);
+      }
+      const starGeo = new THREE.BufferGeometry();
+      starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+      starGeo.setAttribute('aSize', new THREE.BufferAttribute(starSizes, 1));
+      starGeo.setAttribute('aPhase', new THREE.BufferAttribute(starPhases, 1));
+      starGeo.setAttribute('aBrightness', new THREE.BufferAttribute(starBrightness, 1));
+      const starMat = new THREE.ShaderMaterial({
+        uniforms: {
+          uTime: { value: 0 },
+          uPixelRatio: { value: Math.min(window.devicePixelRatio, 1.5) },
+        },
+        vertexShader: `
+          attribute float aSize;
+          attribute float aPhase;
+          attribute float aBrightness;
+          uniform float uTime;
+          uniform float uPixelRatio;
+          varying float vAlpha;
+          varying float vBrightness;
+          void main() {
+            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+            float twinkle = 0.5 + 0.5 * sin(uTime * 0.6 + aPhase * 6.283);
+            vAlpha = twinkle;
+            vBrightness = aBrightness;
+            gl_PointSize = aSize * uPixelRatio * (100.0 / -mvPosition.z);
+            gl_PointSize = max(gl_PointSize, 1.5);
+            gl_Position = projectionMatrix * mvPosition;
+          }
+        `,
+        fragmentShader: `
+          varying float vAlpha;
+          varying float vBrightness;
+          void main() {
+            float d = length(gl_PointCoord - vec2(0.5));
+            if (d > 0.5) discard;
+            float glow = 1.0 - smoothstep(0.0, 0.5, d);
+            glow = pow(glow, 1.0);
+            // Boost values high enough to survive ACES tone mapping
+            vec3 col = mix(vec3(0.85, 0.9, 1.0), vec3(1.0, 0.97, 0.9), vBrightness * 0.5);
+            float intensity = 2.0 + vBrightness * 6.0;
+            gl_FragColor = vec4(col * intensity, glow * vAlpha * (0.4 + vBrightness * 0.6));
+          }
+        `,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      });
+      const stars = new THREE.Points(starGeo, starMat);
+      scene.add(stars);
+
+      // ---- SUN (realistic sphere with animated plasma surface + corona + glow) ----
+      const sunPivot = new THREE.Group();
+      scene.add(sunPivot);
+      const sunPos = new THREE.Vector3(45, 18, -70);
+
+      // Sun sphere with custom shader - roiling plasma surface
+      const sunSurfaceGeo = new THREE.SphereGeometry(2.5, 48, 48);
+      const sunSurfaceMat = new THREE.ShaderMaterial({
+        uniforms: {
+          uTime: { value: 0 },
+        },
+        vertexShader: `
+          varying vec2 vUv;
+          varying vec3 vNormal;
+          varying vec3 vPosition;
+          void main() {
+            vUv = uv;
+            vNormal = normalize(normalMatrix * normal);
+            vPosition = position;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform float uTime;
+          varying vec2 vUv;
+          varying vec3 vNormal;
+          varying vec3 vPosition;
+
+          // Simplex-style noise for plasma turbulence
+          vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+          vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+          vec4 permute(vec4 x) { return mod289(((x * 34.0) + 10.0) * x); }
+          vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+          float snoise(vec3 v) {
+            const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+            const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+            vec3 i = floor(v + dot(v, C.yyy));
+            vec3 x0 = v - i + dot(i, C.xxx);
+            vec3 g = step(x0.yzx, x0.xyz);
+            vec3 l = 1.0 - g;
+            vec3 i1 = min(g.xyz, l.zxy);
+            vec3 i2 = max(g.xyz, l.zxy);
+            vec3 x1 = x0 - i1 + C.xxx;
+            vec3 x2 = x0 - i2 + C.yyy;
+            vec3 x3 = x0 - D.yyy;
+            i = mod289(i);
+            vec4 p = permute(permute(permute(
+              i.z + vec4(0.0, i1.z, i2.z, 1.0))
+              + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+              + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+            float n_ = 0.142857142857;
+            vec3 ns = n_ * D.wyz - D.xzx;
+            vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+            vec4 x_ = floor(j * ns.z);
+            vec4 y_ = floor(j - 7.0 * x_);
+            vec4 x = x_ * ns.x + ns.yyyy;
+            vec4 y = y_ * ns.x + ns.yyyy;
+            vec4 h = 1.0 - abs(x) - abs(y);
+            vec4 b0 = vec4(x.xy, y.xy);
+            vec4 b1 = vec4(x.zw, y.zw);
+            vec4 s0 = floor(b0) * 2.0 + 1.0;
+            vec4 s1 = floor(b1) * 2.0 + 1.0;
+            vec4 sh = -step(h, vec4(0.0));
+            vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
+            vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
+            vec3 p0 = vec3(a0.xy, h.x);
+            vec3 p1 = vec3(a0.zw, h.y);
+            vec3 p2 = vec3(a1.xy, h.z);
+            vec3 p3 = vec3(a1.zw, h.w);
+            vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
+            p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+            vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+            m = m * m;
+            return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+          }
+
+          float fbm(vec3 p) {
+            float f = 0.0;
+            f += 0.5 * snoise(p); p *= 2.02;
+            f += 0.25 * snoise(p); p *= 2.03;
+            f += 0.125 * snoise(p); p *= 2.01;
+            f += 0.0625 * snoise(p);
+            return f / 0.9375;
+          }
+
+          void main() {
+            vec3 pos = vPosition * 1.5;
+            float t = uTime * 0.15;
+
+            // Multi-octave plasma turbulence
+            float n1 = fbm(pos + vec3(t * 0.3, t * 0.2, t * -0.1));
+            float n2 = fbm(pos * 1.5 + vec3(-t * 0.2, t * 0.35, t * 0.15));
+            float n3 = fbm(pos * 3.0 + vec3(t * 0.5, -t * 0.4, t * 0.2));
+
+            // Sunspot-like dark patches
+            float spots = smoothstep(0.2, 0.5, n2 * n2);
+
+            // Color gradient from deep orange core to bright yellow surface
+            vec3 deepOrange = vec3(0.9, 0.3, 0.05);
+            vec3 brightOrange = vec3(1.0, 0.55, 0.1);
+            vec3 hotYellow = vec3(1.0, 0.85, 0.4);
+            vec3 white = vec3(1.0, 0.95, 0.85);
+
+            float mixVal = n1 * 0.5 + 0.5;
+            vec3 col = mix(deepOrange, brightOrange, smoothstep(0.2, 0.5, mixVal));
+            col = mix(col, hotYellow, smoothstep(0.5, 0.75, mixVal));
+            col = mix(col, white, smoothstep(0.75, 0.95, mixVal + n3 * 0.3));
+
+            // Darken sunspot regions
+            col = mix(col, deepOrange * 0.4, (1.0 - spots) * 0.6);
+
+            // Fine granulation detail
+            float granules = snoise(pos * 8.0 + vec3(t * 0.8, t * -0.5, t * 0.3));
+            col += granules * 0.08;
+
+            // Limb darkening (edges darker like a real star)
+            float rim = dot(vNormal, vec3(0.0, 0.0, 1.0));
+            float limb = pow(max(rim, 0.0), 0.4);
+            col *= 0.5 + 0.5 * limb;
+
+            // HDR boost to survive ACES tone mapping
+            col *= 3.5;
+
+            gl_FragColor = vec4(col, 1.0);
+          }
+        `,
+      });
+      const sunMesh = new THREE.Mesh(sunSurfaceGeo, sunSurfaceMat);
+      sunMesh.position.copy(sunPos);
+      sunPivot.add(sunMesh);
+
+      // Corona / atmosphere glow (Fresnel rim around sun sphere)
+      const sunCoronaGeo = new THREE.SphereGeometry(3.2, 48, 48);
+      const sunCoronaMat = new THREE.ShaderMaterial({
+        uniforms: {
+          uTime: { value: 0 },
+          uColor1: { value: new THREE.Color(1.0, 0.6, 0.15) },
+          uColor2: { value: new THREE.Color(1.0, 0.35, 0.05) },
+        },
+        vertexShader: `
+          varying vec3 vNormal;
+          varying vec3 vWorldPos;
+          void main() {
+            vNormal = normalize(normalMatrix * normal);
+            vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform float uTime;
+          uniform vec3 uColor1;
+          uniform vec3 uColor2;
+          varying vec3 vNormal;
+          varying vec3 vWorldPos;
+          void main() {
+            float rim = 1.0 - max(dot(vNormal, vec3(0.0, 0.0, 1.0)), 0.0);
+            float corona = pow(rim, 2.0);
+            // Flickering corona intensity
+            float flicker = 1.0 + sin(uTime * 0.5 + rim * 6.0) * 0.15 + sin(uTime * 1.3 + rim * 12.0) * 0.08;
+            vec3 col = mix(uColor1, uColor2, rim) * corona * flicker * 4.0;
+            float alpha = corona * 0.7 * flicker;
+            gl_FragColor = vec4(col, alpha);
+          }
+        `,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        side: THREE.BackSide,
+        depthWrite: false,
+      });
+      const sunCorona = new THREE.Mesh(sunCoronaGeo, sunCoronaMat);
+      sunCorona.position.copy(sunPos);
+      sunPivot.add(sunCorona);
+
+      // Outer wide glow halo (sprite for bloom effect at distance)
+      const sunOuterCanvas = document.createElement('canvas');
+      sunOuterCanvas.width = 512;
+      sunOuterCanvas.height = 512;
+      const sunOuterCtx = sunOuterCanvas.getContext('2d');
+      const sunOuterGrad = sunOuterCtx.createRadialGradient(256, 256, 0, 256, 256, 256);
+      sunOuterGrad.addColorStop(0, 'rgba(255, 200, 100, 0.5)');
+      sunOuterGrad.addColorStop(0.06, 'rgba(255, 180, 80, 0.35)');
+      sunOuterGrad.addColorStop(0.15, 'rgba(255, 140, 50, 0.15)');
+      sunOuterGrad.addColorStop(0.35, 'rgba(255, 100, 30, 0.04)');
+      sunOuterGrad.addColorStop(1, 'rgba(255, 80, 10, 0.0)');
+      sunOuterCtx.fillStyle = sunOuterGrad;
+      sunOuterCtx.fillRect(0, 0, 512, 512);
+      const sunOuterTex = new THREE.CanvasTexture(sunOuterCanvas);
+      const sunOuter = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: sunOuterTex,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        depthTest: false,
+      }));
+      sunOuter.scale.set(28, 28, 1);
+      sunOuter.position.copy(sunPos);
+      sunPivot.add(sunOuter);
+
+      // Lens streak (horizontal flare line through the sun)
+      const streakCanvas = document.createElement('canvas');
+      streakCanvas.width = 512;
+      streakCanvas.height = 32;
+      const streakCtx = streakCanvas.getContext('2d');
+      const streakGrad = streakCtx.createLinearGradient(0, 16, 512, 16);
+      streakGrad.addColorStop(0, 'rgba(255, 200, 150, 0.0)');
+      streakGrad.addColorStop(0.3, 'rgba(255, 220, 170, 0.08)');
+      streakGrad.addColorStop(0.45, 'rgba(255, 240, 200, 0.25)');
+      streakGrad.addColorStop(0.5, 'rgba(255, 250, 230, 0.4)');
+      streakGrad.addColorStop(0.55, 'rgba(255, 240, 200, 0.25)');
+      streakGrad.addColorStop(0.7, 'rgba(255, 220, 170, 0.08)');
+      streakGrad.addColorStop(1, 'rgba(255, 200, 150, 0.0)');
+      streakCtx.fillStyle = streakGrad;
+      streakCtx.fillRect(0, 0, 512, 32);
+      const streakTex = new THREE.CanvasTexture(streakCanvas);
+      const sunStreak = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: streakTex,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        depthTest: false,
+      }));
+      sunStreak.scale.set(35, 1.5, 1);
+      sunStreak.position.copy(sunPos);
+      sunPivot.add(sunStreak);
+
+      // ---- MOON (realistic textured sphere with craters + proper lighting) ----
+      const moonPivot = new THREE.Group();
+      scene.add(moonPivot);
+
+      // Generate procedural moon surface texture (craters, maria, highlands)
+      const moonTexSize = 512;
+      const moonTexCanvas = document.createElement('canvas');
+      moonTexCanvas.width = moonTexSize;
+      moonTexCanvas.height = moonTexSize;
+      const moonTexCtx = moonTexCanvas.getContext('2d');
+
+      // Base moon surface - varied grey highlands
+      moonTexCtx.fillStyle = '#a8a8a0';
+      moonTexCtx.fillRect(0, 0, moonTexSize, moonTexSize);
+
+      // Seeded random for reproducible moon
+      let moonSeed = 42;
+      function moonRand() {
+        moonSeed = (moonSeed * 16807 + 0) % 2147483647;
+        return moonSeed / 2147483647;
+      }
+
+      // Dark maria (large smooth basalt plains)
+      const mariaCount = 8;
+      for (let i = 0; i < mariaCount; i++) {
+        const mx = moonRand() * moonTexSize;
+        const my = moonRand() * moonTexSize;
+        const mr = 40 + moonRand() * 90;
+        const grad = moonTexCtx.createRadialGradient(mx, my, 0, mx, my, mr);
+        const darkness = 0.55 + moonRand() * 0.15;
+        const grey = Math.floor(120 * darkness);
+        grad.addColorStop(0, `rgba(${grey}, ${grey}, ${grey + 5}, 0.8)`);
+        grad.addColorStop(0.6, `rgba(${grey + 10}, ${grey + 10}, ${grey + 12}, 0.4)`);
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        moonTexCtx.fillStyle = grad;
+        moonTexCtx.beginPath();
+        moonTexCtx.arc(mx, my, mr, 0, Math.PI * 2);
+        moonTexCtx.fill();
+      }
+
+      // Large craters with rims and shadows
+      const largeCraters = 15;
+      for (let i = 0; i < largeCraters; i++) {
+        const cx = moonRand() * moonTexSize;
+        const cy = moonRand() * moonTexSize;
+        const cr = 12 + moonRand() * 30;
+
+        // Shadow on one side (sun from upper-right)
+        moonTexCtx.save();
+        moonTexCtx.beginPath();
+        moonTexCtx.arc(cx, cy, cr, 0, Math.PI * 2);
+        moonTexCtx.clip();
+
+        // Dark crater floor
+        const floorGrey = Math.floor(85 + moonRand() * 30);
+        const floorGrad = moonTexCtx.createRadialGradient(cx, cy, 0, cx, cy, cr);
+        floorGrad.addColorStop(0, `rgb(${floorGrey}, ${floorGrey}, ${floorGrey})`);
+        floorGrad.addColorStop(0.7, `rgb(${floorGrey + 15}, ${floorGrey + 15}, ${floorGrey + 12})`);
+        floorGrad.addColorStop(1, `rgb(${floorGrey + 25}, ${floorGrey + 25}, ${floorGrey + 20})`);
+        moonTexCtx.fillStyle = floorGrad;
+        moonTexCtx.fillRect(cx - cr, cy - cr, cr * 2, cr * 2);
+
+        // Shadow in upper-left of crater (light from upper-right)
+        const shadowGrad = moonTexCtx.createLinearGradient(cx - cr, cy - cr, cx + cr * 0.3, cy + cr * 0.3);
+        shadowGrad.addColorStop(0, 'rgba(0, 0, 0, 0.3)');
+        shadowGrad.addColorStop(0.6, 'rgba(0, 0, 0, 0)');
+        moonTexCtx.fillStyle = shadowGrad;
+        moonTexCtx.fillRect(cx - cr, cy - cr, cr * 2, cr * 2);
+
+        moonTexCtx.restore();
+
+        // Bright rim (lit side - bottom-right)
+        moonTexCtx.beginPath();
+        moonTexCtx.arc(cx, cy, cr, 0, Math.PI * 2);
+        moonTexCtx.strokeStyle = `rgba(200, 200, 195, ${0.3 + moonRand() * 0.3})`;
+        moonTexCtx.lineWidth = 1.5 + moonRand() * 1.5;
+        moonTexCtx.stroke();
+      }
+
+      // Small craters (many tiny impact marks)
+      const smallCraters = 120;
+      for (let i = 0; i < smallCraters; i++) {
+        const cx = moonRand() * moonTexSize;
+        const cy = moonRand() * moonTexSize;
+        const cr = 1.5 + moonRand() * 6;
+        const grey = Math.floor(75 + moonRand() * 40);
+        moonTexCtx.beginPath();
+        moonTexCtx.arc(cx, cy, cr, 0, Math.PI * 2);
+        moonTexCtx.fillStyle = `rgba(${grey}, ${grey}, ${grey}, 0.6)`;
+        moonTexCtx.fill();
+        // Tiny bright rim highlight
+        moonTexCtx.beginPath();
+        moonTexCtx.arc(cx + cr * 0.2, cy + cr * 0.2, cr, Math.PI * 0.8, Math.PI * 1.8);
+        moonTexCtx.strokeStyle = `rgba(190, 190, 185, ${0.15 + moonRand() * 0.2})`;
+        moonTexCtx.lineWidth = 0.5 + moonRand();
+        moonTexCtx.stroke();
+      }
+
+      // Subtle surface noise (regolith texture)
+      const moonImgData = moonTexCtx.getImageData(0, 0, moonTexSize, moonTexSize);
+      for (let i = 0; i < moonImgData.data.length; i += 4) {
+        const noise = (moonRand() - 0.5) * 18;
+        moonImgData.data[i] = Math.max(0, Math.min(255, moonImgData.data[i] + noise));
+        moonImgData.data[i + 1] = Math.max(0, Math.min(255, moonImgData.data[i + 1] + noise));
+        moonImgData.data[i + 2] = Math.max(0, Math.min(255, moonImgData.data[i + 2] + noise));
+      }
+      moonTexCtx.putImageData(moonImgData, 0, 0);
+
+      const moonColorTex = new THREE.CanvasTexture(moonTexCanvas);
+      moonColorTex.wrapS = THREE.RepeatWrapping;
+      moonColorTex.wrapT = THREE.RepeatWrapping;
+
+      // Generate bump map from the same texture (darker = lower)
+      const moonBumpCanvas = document.createElement('canvas');
+      moonBumpCanvas.width = moonTexSize;
+      moonBumpCanvas.height = moonTexSize;
+      const moonBumpCtx = moonBumpCanvas.getContext('2d');
+      moonBumpCtx.drawImage(moonTexCanvas, 0, 0);
+      // Increase contrast for bump effect
+      const bumpData = moonBumpCtx.getImageData(0, 0, moonTexSize, moonTexSize);
+      for (let i = 0; i < bumpData.data.length; i += 4) {
+        const avg = (bumpData.data[i] + bumpData.data[i + 1] + bumpData.data[i + 2]) / 3;
+        const contrast = Math.max(0, Math.min(255, ((avg - 128) * 1.5) + 128));
+        bumpData.data[i] = contrast;
+        bumpData.data[i + 1] = contrast;
+        bumpData.data[i + 2] = contrast;
+      }
+      moonBumpCtx.putImageData(bumpData, 0, 0);
+      const moonBumpTex = new THREE.CanvasTexture(moonBumpCanvas);
+
+      const moonGeo = new THREE.SphereGeometry(0.4, 48, 48);
+      const moonMat = new THREE.MeshPhongMaterial({
+        map: moonColorTex,
+        bumpMap: moonBumpTex,
+        bumpScale: 0.015,
+        color: 0xddddda,
+        shininess: 3,
+        specular: new THREE.Color(0x111111),
+        emissive: new THREE.Color(0x080810),
+      });
+      const moonMesh = new THREE.Mesh(moonGeo, moonMat);
+      moonMesh.position.set(-8, 3, -12);
+      moonPivot.add(moonMesh);
+
+      // Subtle moon glow (cool blue-white halo)
+      const moonGlowCanvas = document.createElement('canvas');
+      moonGlowCanvas.width = 128;
+      moonGlowCanvas.height = 128;
+      const moonGlowCtx = moonGlowCanvas.getContext('2d');
+      const moonGrad = moonGlowCtx.createRadialGradient(64, 64, 0, 64, 64, 64);
+      moonGrad.addColorStop(0, 'rgba(210, 220, 240, 0.4)');
+      moonGrad.addColorStop(0.25, 'rgba(195, 205, 225, 0.18)');
+      moonGrad.addColorStop(0.5, 'rgba(180, 195, 220, 0.06)');
+      moonGrad.addColorStop(1, 'rgba(150, 170, 200, 0.0)');
+      moonGlowCtx.fillStyle = moonGrad;
+      moonGlowCtx.fillRect(0, 0, 128, 128);
+      const moonGlowTex = new THREE.CanvasTexture(moonGlowCanvas);
+      const moonGlowSprite = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: moonGlowTex,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      }));
+      moonGlowSprite.scale.set(1.8, 1.8, 1);
+      moonGlowSprite.position.copy(moonMesh.position);
+      moonPivot.add(moonGlowSprite);
+
+      // ---- LIGHTING (key/fill/rim for real 3D depth) ----
+      // Low ambient so shadows are visible (dark bg needs slightly more)
+      const ambient = new THREE.AmbientLight(0xc8d8f0, 0.5);
+      scene.add(ambient);
+
+      // Key light - warm, strong, top-right-front (sun-like)
+      const keyLight = new THREE.DirectionalLight(0xfff5e6, 2.2);
+      keyLight.position.set(4, 3, 5);
+      scene.add(keyLight);
+
+      // Fill light - cool, subtle, left side (bounce light)
+      const fillLight = new THREE.DirectionalLight(0xc4d4f2, 0.4);
+      fillLight.position.set(-4, -1, 3);
+      scene.add(fillLight);
+
+      // Rim light - from behind, creates bright edge glow
+      const rimLight = new THREE.DirectionalLight(0x88bbff, 0.8);
+      rimLight.position.set(-2, 1, -4);
+      scene.add(rimLight);
+
+      // ---- GLOBE GROUP (holds sphere + atmosphere + pins) ----
+      const globeGroup = new THREE.Group();
+      scene.add(globeGroup);
+
+      // ---- SPHERE GEOMETRY ----
+      const geometry = new THREE.SphereGeometry(1, 96, 96);
+      const maxAniso = renderer.capabilities.getMaxAnisotropy();
+
+      // ---- TEXTURE LOADING ----
+      const loadingManager = new THREE.LoadingManager();
+      let texturesLoaded = 0;
+      const totalTextures = 4;
+      loadingManager.onLoad = () => {
+        window._globeReady = true;
+      };
+      const textureLoader = new THREE.TextureLoader(loadingManager);
+
+      // ---- EARTH SURFACE MATERIAL (MeshPhongMaterial for specular control) ----
+      const material = new THREE.MeshPhongMaterial({
+        color: 0xffffff,
+        shininess: 25,
+        specular: new THREE.Color(0x333333),
+      });
+      const globe = new THREE.Mesh(geometry, material);
+      globeGroup.add(globe);
+
+      // Load color/diffuse map
+      textureLoader.load('images/earth-texture.webp', (tex) => {
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.anisotropy = maxAniso;
+        material.map = tex;
+        material.needsUpdate = true;
+      });
+
+      // Load bump/height map - real AI-generated elevation data
+      textureLoader.load('images/earth-bump.webp', (tex) => {
+        tex.anisotropy = maxAniso;
+        material.bumpMap = tex;
+        material.bumpScale = 0.06;
+        material.needsUpdate = true;
+      });
+
+      // Load specular map - white = shiny ocean, black = matte land
+      textureLoader.load('images/earth-specular.webp', (tex) => {
+        tex.anisotropy = maxAniso;
+        material.specularMap = tex;
+        material.shininess = 40;
+        material.specular.set(0x555566);
+        material.needsUpdate = true;
+      });
+
+      // ---- CLOUD LAYER (separate sphere, slightly larger, rotates independently) ----
+      const cloudGeo = new THREE.SphereGeometry(1.012, 96, 96);
+      const cloudMat = new THREE.MeshPhongMaterial({
+        transparent: true,
+        opacity: 0.55,
+        depthWrite: false,
+        color: 0xffffff,
+        shininess: 0,
+      });
+      const cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
+      globe.add(cloudMesh);
+
+      textureLoader.load('images/earth-clouds.webp', (tex) => {
+        tex.anisotropy = maxAniso;
+        cloudMat.map = tex;
+        cloudMat.alphaMap = tex;
+        cloudMat.needsUpdate = true;
+      });
+
+      // ---- ATMOSPHERE GLOW ----
+      // CSS #globeGlow handles the wide diffuse bloom (no geometry = no ring artifact)
+      const globeGlowEl = document.getElementById('globeGlow');
+
+      // FrontSide Fresnel rim - tight blue edge highlight on the globe
+      const rimGlowGeo = new THREE.SphereGeometry(1.018, 64, 64);
+      const innerGlowMat = new THREE.ShaderMaterial({
+        uniforms: {
+          uOpacity: { value: 1.0 },
+        },
+        vertexShader: `
+          varying vec3 vNormal;
+          varying vec3 vPosition;
+          void main() {
+            vNormal = normalize(normalMatrix * normal);
+            vPosition = (modelViewMatrix * vec4(position, 1.0)).xyz;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform float uOpacity;
+          varying vec3 vNormal;
+          varying vec3 vPosition;
+          void main() {
+            vec3 viewDir = normalize(-vPosition);
+            float rim = 1.0 - max(0.0, dot(viewDir, vNormal));
+            // Multi-layer Fresnel for rich atmospheric edge
+            float tightGlow = pow(rim, 5.0) * 1.0;
+            float midGlow = pow(rim, 3.0) * 0.4;
+            float wideGlow = pow(rim, 1.8) * 0.12;
+            float glow = tightGlow + midGlow + wideGlow;
+            vec3 blueAtmos = vec3(0.3, 0.55, 1.0);
+            gl_FragColor = vec4(blueAtmos, glow * uOpacity);
+          }
+        `,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        side: THREE.FrontSide,
+        depthWrite: false,
+      });
+      const rimGlow = new THREE.Mesh(rimGlowGeo, innerGlowMat);
+      globeGroup.add(rimGlow);
+
+      // No BackSide atmosphere sphere - it always creates a visible ring artifact.
+      // The FrontSide Fresnel rim + CSS #globeGlow handles all atmospheric effects.
+      const outerAtmosMat = { uniforms: { uOpacity: { value: 1.0 } } }; // stub for scroll sync
+
+      // ---- PIN MARKERS ----
+      const projects = [
+        { id: 'row-dental', name: 'Bright Smile Dental', lat: 51.5151, lng: -0.1455, color: 0xC9956B },
+        { id: 'row-law', name: 'Hargrove & Associates', lat: 40.758, lng: -73.9855, color: 0xC9A84C },
+        { id: 'row-coffee', name: 'Ember Roasters', lat: 45.5171, lng: -122.681, color: 0xD4654A },
+        { id: 'row-grifa', name: 'Grifa', lat: 44.8176, lng: 20.4633, color: 0x4A7C6F },
+        { id: 'row-soap', name: 'SApuNiJA', lat: 44.8176, lng: 20.9633, color: 0xD4A0B0 },
+      ];
+
+      function latLngToVec3(lat, lng, radius) {
+        const phi = (90 - lat) * (Math.PI / 180);
+        const theta = (lng + 180) * (Math.PI / 180);
+        return new THREE.Vector3(
+          -radius * Math.sin(phi) * Math.cos(theta),
+          radius * Math.cos(phi),
+          radius * Math.sin(phi) * Math.sin(theta)
+        );
+      }
+
+      function createPinTexture(color, size) {
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        const hex = '#' + color.toString(16).padStart(6, '0');
+
+        // Outer glow halo
+        const gradient = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+        gradient.addColorStop(0, hex);
+        gradient.addColorStop(0.25, hex);
+        gradient.addColorStop(0.45, hex + '99');
+        gradient.addColorStop(0.7, hex + '33');
+        gradient.addColorStop(1, hex + '00');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, size, size);
+
+        // Bright white core
+        const inner = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size * 0.12);
+        inner.addColorStop(0, '#ffffff');
+        inner.addColorStop(0.6, '#ffffffcc');
+        inner.addColorStop(1, hex);
+        ctx.fillStyle = inner;
+        ctx.beginPath();
+        ctx.arc(size/2, size/2, size * 0.12, 0, Math.PI * 2);
+        ctx.fill();
+
+        return new THREE.CanvasTexture(canvas);
+      }
+
+      const pins = [];
+      const pinBaseScale = 0.07;
+      projects.forEach((proj) => {
+        const pos = latLngToVec3(proj.lat, proj.lng, 1.025);
+        const spriteMat = new THREE.SpriteMaterial({
+          map: createPinTexture(proj.color, 64),
+          transparent: true,
+          depthTest: false,
+          depthWrite: false,
+          opacity: 0.7,
+        });
+        const sprite = new THREE.Sprite(spriteMat);
+        sprite.position.copy(pos);
+        sprite.scale.set(pinBaseScale, pinBaseScale, 1);
+        globe.add(sprite);
+        pins.push({ sprite, proj, baseOpacity: 0.7, targetOpacity: 0.7, targetScale: pinBaseScale });
+      });
+
+      // ---- SONAR RINGS ----
+      const sonarPins = [];
+      projects.forEach((proj) => {
+        const pos = latLngToVec3(proj.lat, proj.lng, 1.03);
+        const ringCanvas = document.createElement('canvas');
+        ringCanvas.width = 128;
+        ringCanvas.height = 128;
+        const ctx = ringCanvas.getContext('2d');
+        const hex = '#' + proj.color.toString(16).padStart(6, '0');
+        // Softer ring with gradient stroke
+        ctx.strokeStyle = hex;
+        ctx.lineWidth = 2;
+        ctx.globalAlpha = 0.8;
+        ctx.beginPath();
+        ctx.arc(64, 64, 44, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.globalAlpha = 0.4;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(64, 64, 36, 0, Math.PI * 2);
+        ctx.stroke();
+        const ringTex = new THREE.CanvasTexture(ringCanvas);
+        const ringMat = new THREE.SpriteMaterial({
+          map: ringTex,
+          transparent: true,
+          depthTest: false,
+          depthWrite: false,
+          opacity: 0,
+        });
+        const ring = new THREE.Sprite(ringMat);
+        ring.position.copy(pos);
+        ring.scale.set(0.07, 0.07, 1);
+        globe.add(ring);
+        sonarPins.push({ ring, targetOpacity: 0, targetScale: 0.07 });
+      });
+
+      // ---- GLOBE STATE ----
+      const globeState = {
+        x: 0, y: 0, z: 3.5,
+        scale: 1.0,
+        opacity: 1.0,
+        rotY: 0,
+        autoRotate: true,
+        autoRotSpeed: 0.0012,
+        activePin: -1,
+      };
+
+      // ---- SCROLL TARGETS ----
+      function lngToRotY(lng) {
+        return (-lng * Math.PI / 180) - Math.PI / 2;
+      }
+      const projectTargets = projects.map(p => ({
+        rotY: lngToRotY(p.lng),
+        lat: p.lat,
+      }));
+
+      // ---- MOUSE PARALLAX ----
+      const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+      document.addEventListener('mousemove', (e) => {
+        mouse.tx = (e.clientX / window.innerWidth - 0.5) * 2;
+        mouse.ty = (e.clientY / window.innerHeight - 0.5) * 2;
+      });
+
+      // ---- GSAP SCROLL CHOREOGRAPHY ----
+      gsap.registerPlugin(ScrollTrigger);
+
+      // Hero exit -> Intro: shrink, shift left, dim
+      ScrollTrigger.create({
+        trigger: '#intro',
+        start: 'top bottom',
+        end: 'top 20%',
+        scrub: 1,
+        onUpdate: (self) => {
+          const p = self.progress;
+          globeState.scale = 1.0 - p * 0.3;
+          globeState.x = p * -1.5;
+          globeState.y = p * 0.3;
+          globeState.opacity = 1.0 - p * 0.35;
+        },
+      });
+
+      // Work section: rotate to each project's country
+      projects.forEach((proj, i) => {
+        const rowEl = document.getElementById(proj.id);
+        if (!rowEl) return;
+
+        ScrollTrigger.create({
+          trigger: rowEl,
+          start: 'top 75%',
+          end: 'top 25%',
+          scrub: 1,
+          onUpdate: (self) => {
+            const p = self.progress;
+            if (p > 0.1) {
+              globeState.rotY = projectTargets[i].rotY;
+              globeState.autoRotate = false;
+              globeState.activePin = i;
+              globeState.scale = 0.8;
+              globeState.opacity = 0.7;
+              globeState.x = -1.5;
+            }
+          },
+          onLeaveBack: () => {
+            if (i === 0) {
+              globeState.autoRotate = true;
+              globeState.activePin = -1;
+            }
+          },
+        });
+      });
+
+      // After work: fade to subtle
+      ScrollTrigger.create({
+        trigger: '#services',
+        start: 'top bottom',
+        end: 'top 50%',
+        scrub: 1,
+        onUpdate: (self) => {
+          const p = self.progress;
+          globeState.opacity = 0.7 - p * 0.5;
+          globeState.autoRotate = true;
+          globeState.activePin = -1;
+        },
+      });
+
+      // ---- RESIZE ----
+      function onResize() {
+        if (window.innerWidth < 768) {
+          container.style.display = 'none';
+          return;
+        }
+        container.style.display = 'block';
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+      window.addEventListener('resize', onResize);
+
+      // ---- ANIMATION LOOP (zero allocations per frame) ----
+      let currentRotY = 0;
+      let sonarPhase = 0;
+      let frameTime = 0;
+      const _scaleVec = new THREE.Vector3();   // reused, no GC pressure
+      const _lookAt = new THREE.Vector3(0, 0, 0);
+
+      function animate() {
+        if (document.hidden) {
+          requestAnimationFrame(animate);
+          return;
+        }
+
+        frameTime += 0.016; // ~60fps time step
+
+        // ---- STARS TWINKLE ----
+        starMat.uniforms.uTime.value = frameTime;
+        // Slow star field rotation for subtle parallax depth
+        stars.rotation.y += 0.00003;
+        stars.rotation.x += 0.00001;
+
+        // ---- SUN ORBIT & ANIMATION ----
+        sunPivot.rotation.y += 0.00008;
+        sunPivot.rotation.x = Math.sin(frameTime * 0.02) * 0.03;
+        // Animate sun surface plasma
+        sunSurfaceMat.uniforms.uTime.value = frameTime;
+        sunCoronaMat.uniforms.uTime.value = frameTime;
+        // Slow sun self-rotation
+        sunMesh.rotation.y += 0.0003;
+        sunCorona.rotation.y += 0.0002;
+        // Glow pulsing - subtle breathing
+        const sunPulse = 1.0 + Math.sin(frameTime * 0.3) * 0.04;
+        sunOuter.scale.set(28 * sunPulse, 28 * sunPulse, 1);
+        sunStreak.scale.set(35 * (1.0 + Math.sin(frameTime * 0.2) * 0.08), 1.5, 1);
+
+        // ---- MOON ORBIT ----
+        moonPivot.rotation.y += 0.00015;
+        moonPivot.rotation.x = Math.sin(frameTime * 0.05) * 0.02;
+        // Slow moon self-rotation (tidally locked feel)
+        moonMesh.rotation.y += 0.0001;
+
+        // Smooth mouse lerp
+        mouse.x += (mouse.tx - mouse.x) * 0.04;
+        mouse.y += (mouse.ty - mouse.y) * 0.04;
+
+        // Auto rotation
+        if (globeState.autoRotate) {
+          globeState.rotY += globeState.autoRotSpeed;
+        }
+
+        // Smooth rotation - shortest path
+        let rotDiff = globeState.rotY - currentRotY;
+        if (Math.abs(rotDiff) > Math.PI) {
+          rotDiff -= Math.sign(rotDiff) * Math.PI * 2;
+        }
+        currentRotY += rotDiff * 0.05;
+        globe.rotation.y = currentRotY;
+
+        // Axial tilt for 3D depth
+        globe.rotation.x = 0.2;
+        globe.rotation.z = -0.05;
+
+        // Mouse parallax on camera
+        camera.position.x = mouse.x * 0.25;
+        camera.position.y = -mouse.y * 0.15;
+        camera.position.z = globeState.z;
+        camera.lookAt(_lookAt);
+
+        // Globe group position (lerp)
+        globeGroup.position.x += (globeState.x - globeGroup.position.x) * 0.06;
+        globeGroup.position.y += (globeState.y - globeGroup.position.y) * 0.06;
+
+        // Globe scale (reuse vector, no allocation)
+        const ts = globeState.scale;
+        _scaleVec.set(ts, ts, ts);
+        globeGroup.scale.lerp(_scaleVec, 0.06);
+
+        // Opacity via material
+        const to = globeState.opacity;
+        material.opacity += (to - material.opacity) * 0.06;
+        material.transparent = true;
+        innerGlowMat.uniforms.uOpacity.value += (to - innerGlowMat.uniforms.uOpacity.value) * 0.06;
+        outerAtmosMat.uniforms.uOpacity.value += (to - outerAtmosMat.uniforms.uOpacity.value) * 0.06;
+        cloudMat.opacity = 0.55 * to;
+
+        // Cloud layer rotates independently (slightly faster than globe auto-rotation)
+        cloudMesh.rotation.y += 0.0003;
+
+        // Sync CSS atmosphere glow opacity and position with globe
+        if (globeGlowEl) {
+          globeGlowEl.style.opacity = to;
+          const globeWorldPos = globeGroup.position.clone();
+          globeWorldPos.project(camera);
+          const screenX = (globeWorldPos.x * 0.5 + 0.5) * window.innerWidth;
+          const screenY = (-globeWorldPos.y * 0.5 + 0.5) * window.innerHeight;
+          const glowSize = 900 * globeState.scale;
+          globeGlowEl.style.width = glowSize + 'px';
+          globeGlowEl.style.height = glowSize + 'px';
+          globeGlowEl.style.left = screenX + 'px';
+          globeGlowEl.style.top = screenY + 'px';
+        }
+
+        // Pin animations
+        sonarPhase += 0.025;
+        for (let i = 0; i < pins.length; i++) {
+          const pin = pins[i];
+          const isActive = globeState.activePin === i;
+          pin.targetOpacity = isActive ? 1.0 : 0.7;
+          pin.targetScale = isActive ? pinBaseScale * 2.5 : pinBaseScale;
+
+          pin.sprite.material.opacity += (pin.targetOpacity - pin.sprite.material.opacity) * 0.08;
+
+          const cs = pin.sprite.scale.x;
+          const ns = cs + (pin.targetScale - cs) * 0.08;
+          pin.sprite.scale.set(ns, ns, 1);
+
+          // Sonar ring
+          const sonar = sonarPins[i];
+          if (isActive) {
+            const pulse = (Math.sin(sonarPhase * 2.5) + 1) * 0.5;
+            sonar.ring.material.opacity = pulse * 0.6;
+            const ss = pinBaseScale * (2.2 + pulse * 2.0);
+            sonar.ring.scale.set(ss, ss, 1);
+          } else {
+            sonar.ring.material.opacity *= 0.9;
+          }
+        }
+
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
   </script>
 
 </body>
