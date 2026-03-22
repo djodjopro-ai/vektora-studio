@@ -44,10 +44,10 @@
   }
   </script>
 
-  <!-- Fonts: Outfit (display/body) + IBM Plex Mono (accents) -->
+  <!-- Fonts: Outfit (body) + IBM Plex Mono (accents) + Syne (hero display) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -310,38 +310,124 @@
       position: relative;
       padding: 8rem 1.5rem 4rem;
     }
-    .hero-title {
-      font-weight: 800;
-      line-height: 0.92;
-      letter-spacing: -0.03em;
-      color: #E8ECF4;
+
+    /* Hero typography */
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    .hero-line {
-      display: block;
+
+    /* Brand name - architectural display */
+    .hero-brand-line {
       overflow: hidden;
     }
-    .hero-line-inner {
+    .hero-brand-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(4.5rem, 14vw, 13rem);
+      line-height: 0.88;
+      letter-spacing: -0.03em;
+      color: #E8ECF4;
       display: block;
       transform: translateY(110%);
+      text-shadow:
+        0 2px 20px rgba(0, 0, 0, 0.5),
+        0 0 60px rgba(5, 5, 16, 0.4);
     }
+    .hero-brand-sub {
+      font-family: 'Syne', sans-serif;
+      font-weight: 500;
+      font-size: clamp(1.2rem, 3.5vw, 3.2rem);
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(166, 128, 255, 1);
+      display: block;
+      transform: translateY(110%);
+      margin-top: 0.15em;
+      text-shadow:
+        0 0 20px rgba(0, 0, 0, 0.9),
+        0 0 50px rgba(5, 5, 16, 0.8),
+        0 0 80px rgba(5, 5, 16, 0.6);
+    }
+
+    /* Thin divider line */
+    .hero-divider {
+      width: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(166, 128, 255, 0.5), transparent);
+      margin: 1.8rem auto;
+    }
+
+    /* Frosted backdrop behind services + subtitle for readability over globe */
+    .hero-info-backdrop {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(5, 5, 20, 0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      padding: 1rem 3rem;
+      margin-top: 1rem;
+      opacity: 0;
+      transform: translateY(10px);
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    /* Services row */
+    .hero-services-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.75rem;
+    }
+    .hero-services-line .service-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(166, 128, 255, 0.9);
+      flex-shrink: 0;
+    }
+    .hero-services-line .service-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #FFFFFF;
+      white-space: nowrap;
+    }
+
+    /* Rotating subtitles */
     .hero-subtitle-wrapper {
       height: 1.75rem;
       overflow: hidden;
       position: relative;
-      margin-top: 2rem;
+      margin-top: 1.25rem;
+      opacity: 0;
     }
     .hero-subtitle {
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.875rem;
-      font-weight: 400;
-      letter-spacing: 0.1em;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: #8896AB;
+      color: rgba(255, 255, 255, 0.8);
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
       white-space: nowrap;
       opacity: 0;
+      text-shadow:
+        0 0 16px rgba(0, 0, 0, 0.95),
+        0 0 40px rgba(5, 5, 16, 0.9),
+        0 0 80px rgba(5, 5, 16, 0.7);
     }
     .hero-subtitle.active {
       opacity: 1;
@@ -803,8 +889,13 @@
       .nav-cta-desktop { display: none; }
 
       .hero { padding: 6rem 1rem 3rem; }
-      .hero-title { font-size: clamp(3rem, 14vw, 5rem); }
-      .hero-subtitle-wrapper { margin-top: 1.5rem; }
+      .hero-brand-name { font-size: clamp(3rem, 14vw, 5rem); }
+      .hero-brand-sub { font-size: clamp(0.8rem, 3.5vw, 1.4rem); letter-spacing: 0.25em; }
+      .hero-info-backdrop { padding: 0.875rem 1.5rem; border-radius: 999px; }
+      .hero-services-line { gap: 0.75rem; }
+      .hero-services-line .service-label { font-size: 0.6875rem; letter-spacing: 0.12em; }
+      .hero-subtitle-wrapper { margin-top: 0.75rem; }
+      .hero-divider { margin: 1.2rem auto; }
 
       .project-row {
         grid-template-columns: 1fr;
@@ -845,7 +936,10 @@
       .process-grid {
         grid-template-columns: 1fr;
       }
-      .hero-title { font-size: clamp(2.5rem, 15vw, 4rem); }
+      .hero-brand-name { font-size: clamp(2.5rem, 16vw, 3.5rem); }
+      .hero-brand-sub { font-size: clamp(0.7rem, 3vw, 1rem); letter-spacing: 0.2em; }
+      .hero-info-backdrop { padding: 0.75rem 1.25rem; border-radius: 1.5rem; }
+      .hero-services-line .service-label { font-size: 0.625rem; letter-spacing: 0.1em; }
     }
   </style>
 </head>
@@ -896,17 +990,29 @@
   <!-- HERO -->
   <!-- ============================================ -->
   <section class="hero" id="home">
-    <div class="relative z-10 max-w-5xl mx-auto">
-      <h1 class="hero-title" style="font-size: clamp(4rem, 12vw, 9rem);">
-        <span class="hero-line"><span class="hero-line-inner">Vektora</span></span>
-        <span class="hero-line"><span class="hero-line-inner">Studio</span></span>
+    <div class="hero-content">
+      <h1>
+        <span class="hero-brand-line"><span class="hero-brand-name">Vektora</span></span>
+        <span class="hero-brand-line"><span class="hero-brand-sub">Studio</span></span>
       </h1>
 
+      <div class="hero-divider"></div>
+
+      <div class="hero-info-backdrop">
+        <div class="hero-services-line">
+          <span class="service-label">Web Design</span>
+          <span class="service-dot"></span>
+          <span class="service-label">Development</span>
+          <span class="service-dot"></span>
+          <span class="service-label">Brand Identity</span>
+        </div>
+      </div>
+
       <div class="hero-subtitle-wrapper">
-        <span class="hero-subtitle active" data-subtitle="0">Web Design</span>
-        <span class="hero-subtitle" data-subtitle="1">Web Development</span>
-        <span class="hero-subtitle" data-subtitle="2">Brand Identity</span>
-        <span class="hero-subtitle" data-subtitle="3">SEO Optimization</span>
+        <span class="hero-subtitle active" data-subtitle="0">Crafting Digital Experiences</span>
+        <span class="hero-subtitle" data-subtitle="1">From Belgrade to the World</span>
+        <span class="hero-subtitle" data-subtitle="2">Design That Converts</span>
+        <span class="hero-subtitle" data-subtitle="3">Pixel-Perfect Builds</span>
       </div>
     </div>
 
@@ -1363,20 +1469,40 @@
     function animateHero() {
       const tl = gsap.timeline();
 
-      // Animate hero lines sliding up
-      tl.to('.hero-line-inner', {
+      // Brand name slides up with stagger
+      tl.to('.hero-brand-name', {
         y: 0,
-        duration: 0.9,
-        stagger: 0.15,
+        duration: 1.2,
         ease: 'power3.out',
       });
 
-      // Fade in subtitle
-      tl.to('.hero-subtitle.active', {
+      tl.to('.hero-brand-sub', {
+        y: 0,
+        duration: 1.0,
+        ease: 'power3.out',
+      }, '-=0.7');
+
+      // Divider line expands
+      tl.to('.hero-divider', {
+        width: '120px',
+        duration: 0.8,
+        ease: 'power2.inOut',
+      }, '-=0.5');
+
+      // Info backdrop (services pill) fades in
+      tl.to('.hero-info-backdrop', {
+        opacity: 1,
+        y: 0,
+        duration: 0.7,
+        ease: 'power2.out',
+      }, '-=0.3');
+
+      // Subtitle wrapper fades in
+      tl.to('.hero-subtitle-wrapper', {
         opacity: 1,
         duration: 0.6,
         ease: 'power2.out',
-      }, '-=0.3');
+      }, '-=0.2');
 
       // Fade in scroll prompt
       tl.to('#scrollPrompt', {
@@ -1386,7 +1512,7 @@
       }, '-=0.2');
 
       // Start subtitle rotation
-      setTimeout(startSubtitleRotation, 3000);
+      setTimeout(startSubtitleRotation, 3500);
     }
 
     // ---- ROTATING SUBTITLES ----
